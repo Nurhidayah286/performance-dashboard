@@ -16,44 +16,66 @@
         /* Use the Inter font family */
         body {
             font-family: 'Inter', sans-serif;
+            /* REMOVED 'overflow: hidden;' which was preventing scrolling */
+        }
+        /* Style for the background canvas */
+        #billiard-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Place it behind all other content */
+            background-color: #8B4513; /* Billiard table green */
+        }
+        /* Custom class for the semi-transparent "glass" effect */
+        .glass-card {
+            background-color: rgba(31, 41, 55, 0.8); /* bg-gray-800 with 80% opacity */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
 
-    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+    <!-- The animated background canvas -->
+    <canvas id="billiard-bg"></canvas>
+
+    <!-- Main page content container -->
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-7xl">
         
         <!-- Header Section -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-white">Monthly Performance Review</h1>
-            <p class="text-md text-gray-400 mt-2">Accuracy vs. Productivity</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Monthly Performance Review</h1>
+            <p class="text-md text-gray-300 mt-2">Accuracy vs. Productivity</p>
         </header>
 
         <!-- Main Chart Container -->
-        <main class="bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
+        <main class="glass-card rounded-xl shadow-lg p-4 sm:p-6">
             <canvas id="performanceChart"></canvas>
         </main>
 
         <!-- Insights & Summary Section -->
         <section class="mt-8">
-            <h2 class="text-2xl font-semibold text-white mb-4">Key Insights</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 class="text-2xl font-semibold text-white mb-4 text-center">Key Insights</h2>
+            <div class="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
                 <!-- Card 1: Peak Performance -->
-                <div class="bg-gray-800 rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
                     <h3 class="font-bold text-lg text-white">Peak Performance</h3>
                     <p class="text-gray-300 mt-2">
                         <strong class="text-orange-400">January 2025</strong> saw the highest productivity (731 tasks) and a top-tier accuracy of 97.92%.
                     </p>
                 </div>
                 <!-- Card 2: Performance Dips -->
-                <div class="bg-gray-800 rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
                     <h3 class="font-bold text-lg text-white">Performance Dips (Feb & May)</h3>
                     <p class="text-gray-300 mt-2">
                         Accuracy dips in Feb (87.04%) and May (87.8%) were linked to lower task volumes (174 & 65). This was due to taking two weeks of annual leave during those periods.
                     </p>
                 </div>
                 <!-- Card 3: General Trend -->
-                <div class="bg-gray-800 rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
                     <h3 class="font-bold text-lg text-white">General Trend</h3>
                     <p class="text-gray-300 mt-2">
                         Accuracy generally remains strong, showcasing a commitment to quality even when task volume fluctuates.
@@ -63,127 +85,174 @@
         </section>
         
         <!-- Footer -->
-        <footer class="text-center mt-12 text-gray-500 text-sm">
+        <footer class="text-center mt-12 pb-8 text-gray-500 text-sm">
             <p>Interactive report generated on <span id="generationDate"></span>.</p>
         </footer>
 
     </div>
 
     <script>
-        // --- DATA ---
+        // --- BACKGROUND BILLIARD SIMULATION SCRIPT ---
+        const bgCanvas = document.getElementById('billiard-bg');
+        const bgCtx = bgCanvas.getContext('2d');
+
+        // Set canvas to full screen
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+
+        const BALL_RADIUS = 10;
+        const NUM_BALLS = 15; // Increased for a fuller table effect
+
+        class Ball {
+            constructor(x, y, radius, color, velocityX, velocityY) {
+                this.x = x; this.y = y; this.radius = radius;
+                this.color = color; this.velocityX = velocityX; this.velocityY = velocityY;
+                this.mass = 1; // For more realistic collisions
+            }
+
+            draw() {
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                bgCtx.fillStyle = this.color;
+                // Add a subtle shadow to the balls
+                bgCtx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                bgCtx.shadowBlur = 5;
+                bgCtx.shadowOffsetX = 2;
+                bgCtx.shadowOffsetY = 2;
+                bgCtx.fill();
+                bgCtx.closePath();
+                // Reset shadow for other drawings
+                bgCtx.shadowColor = 'transparent';
+                bgCtx.shadowBlur = 0;
+            }
+
+            update(balls) {
+                 // Wall collision
+                if (this.x - this.radius <= 0 || this.x + this.radius >= bgCanvas.width) {
+                    this.velocityX = -this.velocityX;
+                }
+                if (this.y - this.radius <= 0 || this.y + this.radius >= bgCanvas.height) {
+                    this.velocityY = -this.velocityY;
+                }
+                
+                // Ball collision
+                for (let i = 0; i < balls.length; i++) {
+                    if (this === balls[i]) continue;
+                    const dx = this.x - balls[i].x;
+                    const dy = this.y - balls[i].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < this.radius + balls[i].radius) {
+                        // Collision response logic
+                        const angle = Math.atan2(dy, dx);
+                        const sin = Math.sin(angle);
+                        const cos = Math.cos(angle);
+                        
+                        let pos0 = {x: 0, y: 0};
+                        let pos1 = {x: dx * cos + dy * sin, y: dy * cos - dx * sin};
+
+                        let vel0 = {x: this.velocityX * cos + this.velocityY * sin, y: this.velocityY * cos - this.velocityX * sin};
+                        let vel1 = {x: balls[i].velocityX * cos + balls[i].velocityY * sin, y: balls[i].velocityY * cos - balls[i].velocityX * sin};
+                        
+                        let velTotal = vel0.x - vel1.x;
+                        vel0.x = ((this.mass - balls[i].mass) * vel0.x + 2 * balls[i].mass * vel1.x) / (this.mass + balls[i].mass);
+                        vel1.x = velTotal + vel0.x;
+
+                        pos0.x += vel0.x;
+                        pos1.x += vel1.x;
+                        
+                        let posFinal0 = {x: pos0.x * cos - pos0.y * sin, y: pos0.y * cos + pos0.x * sin};
+                        let posFinal1 = {x: pos1.x * cos - pos1.y * sin, y: pos1.y * cos + pos1.x * sin};
+                        
+                        balls[i].x = this.x + posFinal1.x;
+                        balls[i].y = this.y + posFinal1.y;
+                        this.x = this.x + posFinal0.x;
+                        this.y = this.y + posFinal0.y;
+
+                        this.velocityX = vel0.x * cos - vel0.y * sin;
+                        this.velocityY = vel0.y * cos + vel0.x * sin;
+                        balls[i].velocityX = vel1.x * cos - vel1.y * sin;
+                        balls[i].velocityY = vel1.y * cos + vel1.x * sin;
+                    }
+                }
+
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+            }
+        }
+        
+        const background_balls = [];
+        const ball_colors = ['#000000', '#FFD700', '#FFFFFF'];
+        for (let i = 0; i < NUM_BALLS; i++) {
+            const x = Math.random() * (bgCanvas.width - 2 * BALL_RADIUS) + BALL_RADIUS;
+            const y = Math.random() * (bgCanvas.height - 2 * BALL_RADIUS) + BALL_RADIUS;
+            const color = ball_colors[i % ball_colors.length];
+            const velocityX = (Math.random() - 0.5) * 2;
+            const velocityY = (Math.random() - 0.5) * 2;
+            background_balls.push(new Ball(x, y, BALL_RADIUS, color, velocityX, velocityY));
+        }
+
+        function animateBackground() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            background_balls.forEach(ball => {
+                ball.update(background_balls);
+                ball.draw();
+            });
+            requestAnimationFrame(animateBackground);
+        }
+        
+        window.addEventListener('resize', () => {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        });
+
+        animateBackground();
+        // --- END OF BACKGROUND SCRIPT ---
+
+
+        // --- MAIN CHART SCRIPT ---
         const labels = ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'];
         const accuracyData = [91.29, 97.92, 87.04, 90.6, 92.75, 87.8];
         const productivityData = [578, 731, 174, 414, 212, 65];
 
-        // --- CHART CONFIGURATION ---
         const ctx = document.getElementById('performanceChart').getContext('2d');
         const performanceChart = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        type: 'line',
-                        label: 'Accuracy (%)',
-                        data: accuracyData,
-                        borderColor: 'rgb(251, 146, 60)', // Light Orange
-                        backgroundColor: 'rgba(251, 146, 60, 0.2)',
-                        yAxisID: 'y1',
-                        tension: 0.3,
-                        fill: true,
-                    },
-                    {
-                        type: 'bar',
-                        label: 'Productivity (Tasks)',
-                        data: productivityData,
-                        backgroundColor: 'rgba(249, 115, 22, 0.8)', // Orange
-                        borderColor: 'rgb(249, 115, 22)',
-                        yAxisID: 'y',
-                        barPercentage: 0.6,
-                        categoryPercentage: 0.7,
-                    }
-                ]
+            data: { /* Chart data is unchanged */ },
+            options: { /* Chart options are unchanged */ }
+        });
+        
+        // This part of the script is identical to the previous version
+        performanceChart.data.labels = labels;
+        performanceChart.data.datasets = [
+            {
+                type: 'line', label: 'Accuracy (%)', data: accuracyData, borderColor: 'rgb(251, 146, 60)',
+                backgroundColor: 'rgba(251, 146, 60, 0.2)', yAxisID: 'y1', tension: 0.3, fill: true,
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Productivity (Number of Tasks)',
-                            color: '#d1d5db', // gray-300
-                            font: { weight: 'bold' }
-                        },
-                        ticks: { color: '#9ca3af' }, // gray-400
-                        grid: { drawOnChartArea: false },
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'Accuracy (%)',
-                            color: '#d1d5db', // gray-300
-                            font: { weight: 'bold' }
-                        },
-                        min: Math.min(...accuracyData) - 5 < 0 ? 0 : Math.min(...accuracyData) - 5,
-                        max: 100,
-                        ticks: { color: '#9ca3af' }, // gray-400
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#9ca3af' }, // gray-400
-                        grid: { display: false }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#d1d5db', // gray-300
-                            font: { size: 14 }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1f2937', // gray-800
-                        titleColor: '#ffffff',
-                        bodyColor: '#e5e7eb',
-                        titleFont: { weight: 'bold' },
-                        bodyFont: { size: 14 },
-                        padding: 12,
-                        cornerRadius: 8,
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) { label += ': '; }
-                                if (context.dataset.yAxisID === 'y1') {
-                                    label += context.parsed.y.toFixed(2) + '%';
-                                } else {
-                                    label += context.parsed.y;
-                                }
-                                return label;
-                            }
-                        }
+            {
+                type: 'bar', label: 'Productivity (Tasks)', data: productivityData, backgroundColor: 'rgba(249, 115, 22, 0.8)',
+                borderColor: 'rgb(249, 115, 22)', yAxisID: 'y', barPercentage: 0.6, categoryPercentage: 0.7,
+            }
+        ];
+        performanceChart.options = {
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
+            scales: {
+                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Productivity (Number of Tasks)', color: '#d1d5db', font: { weight: 'bold' } }, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }, },
+                y1: { type: 'linear', display: true, position: 'right', title: { display: 'true', text: 'Accuracy (%)', color: '#d1d5db', font: { weight: 'bold' } }, min: Math.min(...accuracyData) - 5 < 0 ? 0 : Math.min(...accuracyData) - 5, max: 100, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { color: '#d1d5db', font: { size: 14 } } },
+                tooltip: { backgroundColor: '#1f2937', titleColor: '#ffffff', bodyColor: '#e5e7eb', titleFont: { weight: 'bold' }, bodyFont: { size: 14 }, padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    callbacks: {
+                        label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.dataset.yAxisID === 'y1') { label += context.parsed.y.toFixed(2) + '%'; } else { label += context.parsed.y; } return label; }
                     }
                 }
             }
-        });
-        
-        // --- HELPER SCRIPT ---
-        document.getElementById('generationDate').textContent = new Date().toLocaleDateString('en-US', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
+        };
+        performanceChart.update();
+
+        document.getElementById('generationDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     </script>
 
 </body>
