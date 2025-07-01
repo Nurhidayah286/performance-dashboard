@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Dashboard</title>
-    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for creating the chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts for better typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,75 +13,76 @@
         /* Use the Inter font family */
         body {
             font-family: 'Inter', sans-serif;
-            /* REMOVED 'overflow: hidden;' which was preventing scrolling */
         }
         /* Style for the background canvas */
-        #billiard-bg {
+        #animated-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             z-index: -1; /* Place it behind all other content */
-            background-color: #8B4513; /* Billiard table green */
+            background-color: #121212; /* MODIFIED: Off-black background */
         }
         /* Custom class for the semi-transparent "glass" effect */
         .glass-card {
-            background-color: rgba(31, 41, 55, 0.8); /* bg-gray-800 with 80% opacity */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(41, 41, 41, 0.75); /* MODIFIED: Dark grey glass */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* MODIFIED: Slightly brighter border */
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
 
-    <!-- The animated background canvas -->
-    <canvas id="billiard-bg"></canvas>
+    <canvas id="animated-bg"></canvas>
 
-    <!-- Main page content container -->
     <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-7xl">
         
-        <!-- Header Section -->
         <header class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Monthly Performance Review</h1>
-            <p class="text-md text-gray-300 mt-2">Accuracy vs. Productivity</p>
+            <p class="text-md text-gray-300 mt-2">Accuracy vs. Productivity Dashboard</p>
         </header>
 
-        <!-- Main Chart Container -->
         <main class="glass-card rounded-xl shadow-lg p-4 sm:p-6">
-            <canvas id="performanceChart"></canvas>
+            <div style="height: 450px;">
+                 <canvas id="performanceChart"></canvas>
+            </div>
         </main>
 
-        <!-- Insights & Summary Section -->
         <section class="mt-8">
-            <h2 class="text-2xl font-semibold text-white mb-4 text-center">Key Insights</h2>
-            <div class="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
-                <!-- Card 1: Peak Performance -->
-                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+            <h2 class="text-2xl font-semibold text-white mb-4 text-center">Performance Summary & Key Insights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                
+                 <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-400 md:col-span-2">
+                    <h3 class="font-bold text-lg text-white">Detailed Performance Breakdown</h3>
+                    <div class="text-gray-300 mt-3 text-sm space-y-2 font-mono">
+                         <p class="font-sans font-bold text-base text-orange-400">Performance Overall: 2B, 1C+, 3C</p>
+                         <p class="text-xs text-gray-400 pt-1">Month: Rating (Personal Accuracy / Project Accuracy / Productivity / Deadline)</p>
+                         <p>Dec 2024: C (91.29% / 86% / 578 / Met)</p>
+                         <p>Jan 2025: B (97.92% / 86% / 731 / Met)</p>
+                         <p>Feb 2025: C (87.04% / 86% / 174 / Met)</p>
+                         <p>Mar 2025: B (90.6% / 86% / 414 / Met)</p>
+                         <p>Apr 2025: C+ (92.75% / 86% / 212 / Met)</p>
+                         <p>May 2025: C (87.8% / 86% / 65 / Met)</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-blue-400">
                     <h3 class="font-bold text-lg text-white">Peak Performance</h3>
                     <p class="text-gray-300 mt-2">
-                        <strong class="text-orange-400">January 2025</strong> saw the highest productivity (731 tasks) and a top-tier accuracy of 97.92%.
+                        <strong class="text-blue-300">January 2025</strong> saw the highest productivity (731 tasks) and a top-tier accuracy of 97.92%, earning a 'B' rating.
                     </p>
                 </div>
-                <!-- Card 2: Performance Dips -->
-                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
                     <h3 class="font-bold text-lg text-white">Performance Dips (Feb & May)</h3>
                     <p class="text-gray-300 mt-2">
-                        Accuracy dips in Feb (87.04%) and May (87.8%) were linked to lower task volumes (174 & 65). This was due to taking two weeks of annual leave during those periods.
-                    </p>
-                </div>
-                <!-- Card 3: General Trend -->
-                <div class="glass-card rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-                    <h3 class="font-bold text-lg text-white">General Trend</h3>
-                    <p class="text-gray-300 mt-2">
-                        Accuracy generally remains strong, showcasing a commitment to quality even when task volume fluctuates.
+                        Accuracy dips in Feb (87.04%) and May (87.8%) were linked to lower task volumes due to annual leave.
                     </p>
                 </div>
             </div>
         </section>
         
-        <!-- Footer -->
         <footer class="text-center mt-12 pb-8 text-gray-500 text-sm">
             <p>Interactive report generated on <span id="generationDate"></span>.</p>
         </footer>
@@ -92,166 +90,100 @@
     </div>
 
     <script>
-        // --- BACKGROUND BILLIARD SIMULATION SCRIPT ---
-        const bgCanvas = document.getElementById('billiard-bg');
+        // --- ANIMATED BACKGROUND SCRIPT ("The Digital Cosmos") ---
+        const bgCanvas = document.getElementById('animated-bg');
         const bgCtx = bgCanvas.getContext('2d');
-
-        // Set canvas to full screen
         bgCanvas.width = window.innerWidth;
         bgCanvas.height = window.innerHeight;
 
-        const BALL_RADIUS = 10;
-        const NUM_BALLS = 15; // Increased for a fuller table effect
+        // MODIFIED: Increased number of stars, smaller radius
+        const NUM_STARS = 50;
+        const STAR_RADIUS = 8;
 
-        class Ball {
+        // MODIFIED: New color palette for the stars
+        const star_colors = ['#FFFFFF', '#E0E8FF', '#C0D0FF'];
+
+        class Star {
             constructor(x, y, radius, color, velocityX, velocityY) {
                 this.x = x; this.y = y; this.radius = radius;
                 this.color = color; this.velocityX = velocityX; this.velocityY = velocityY;
-                this.mass = 1; // For more realistic collisions
+                this.mass = 1;
+                // MODIFIED: Properties for twinkling effect
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.opacityChange = (Math.random() - 0.5) * 0.01;
             }
 
+            // MODIFIED: Draw method now draws a 4-pointed star
             draw() {
+                bgCtx.save();
+                bgCtx.globalAlpha = this.opacity;
                 bgCtx.beginPath();
-                bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                bgCtx.moveTo(this.x, this.y - this.radius); // Top point
+                bgCtx.quadraticCurveTo(this.x, this.y, this.x + this.radius, this.y); // Right point
+                bgCtx.quadraticCurveTo(this.x, this.y, this.x, this.y + this.radius); // Bottom point
+                bgCtx.quadraticCurveTo(this.x, this.y, this.x - this.radius, this.y); // Left point
+                bgCtx.quadraticCurveTo(this.x, this.y, this.x, this.y - this.radius); // Back to Top
                 bgCtx.fillStyle = this.color;
-                // Add a subtle shadow to the balls
-                bgCtx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                bgCtx.shadowBlur = 5;
-                bgCtx.shadowOffsetX = 2;
-                bgCtx.shadowOffsetY = 2;
                 bgCtx.fill();
-                bgCtx.closePath();
-                // Reset shadow for other drawings
-                bgCtx.shadowColor = 'transparent';
-                bgCtx.shadowBlur = 0;
+                bgCtx.restore();
             }
 
-            update(balls) {
-                 // Wall collision
-                if (this.x - this.radius <= 0 || this.x + this.radius >= bgCanvas.width) {
-                    this.velocityX = -this.velocityX;
-                }
-                if (this.y - this.radius <= 0 || this.y + this.radius >= bgCanvas.height) {
-                    this.velocityY = -this.velocityY;
-                }
+            update(stars) {
+                // Wall collision
+                if (this.x - this.radius <= 0 || this.x + this.radius >= bgCanvas.width) { this.velocityX = -this.velocityX; }
+                if (this.y - this.radius <= 0 || this.y + this.radius >= bgCanvas.height) { this.velocityY = -this.velocityY; }
                 
-                // Ball collision
-                for (let i = 0; i < balls.length; i++) {
-                    if (this === balls[i]) continue;
-                    const dx = this.x - balls[i].x;
-                    const dy = this.y - balls[i].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < this.radius + balls[i].radius) {
-                        // Collision response logic
-                        const angle = Math.atan2(dy, dx);
-                        const sin = Math.sin(angle);
-                        const cos = Math.cos(angle);
-                        
-                        let pos0 = {x: 0, y: 0};
-                        let pos1 = {x: dx * cos + dy * sin, y: dy * cos - dx * sin};
-
-                        let vel0 = {x: this.velocityX * cos + this.velocityY * sin, y: this.velocityY * cos - this.velocityX * sin};
-                        let vel1 = {x: balls[i].velocityX * cos + balls[i].velocityY * sin, y: balls[i].velocityY * cos - balls[i].velocityX * sin};
-                        
-                        let velTotal = vel0.x - vel1.x;
-                        vel0.x = ((this.mass - balls[i].mass) * vel0.x + 2 * balls[i].mass * vel1.x) / (this.mass + balls[i].mass);
-                        vel1.x = velTotal + vel0.x;
-
-                        pos0.x += vel0.x;
-                        pos1.x += vel1.x;
-                        
-                        let posFinal0 = {x: pos0.x * cos - pos0.y * sin, y: pos0.y * cos + pos0.x * sin};
-                        let posFinal1 = {x: pos1.x * cos - pos1.y * sin, y: pos1.y * cos + pos1.x * sin};
-                        
-                        balls[i].x = this.x + posFinal1.x;
-                        balls[i].y = this.y + posFinal1.y;
-                        this.x = this.x + posFinal0.x;
-                        this.y = this.y + posFinal0.y;
-
-                        this.velocityX = vel0.x * cos - vel0.y * sin;
-                        this.velocityY = vel0.y * cos + vel0.x * sin;
-                        balls[i].velocityX = vel1.x * cos - vel1.y * sin;
-                        balls[i].velocityY = vel1.y * cos + vel1.x * sin;
-                    }
-                }
+                // No star-to-star collision for a more "drifty" feel, just move them.
 
                 this.x += this.velocityX;
                 this.y += this.velocityY;
+
+                // MODIFIED: Update opacity for twinkling
+                if (this.opacity > 0.9 || this.opacity < 0.1) {
+                    this.opacityChange = -this.opacityChange;
+                }
+                this.opacity += this.opacityChange;
             }
         }
-        
-        const background_balls = [];
-        const ball_colors = ['#000000', '#FFD700', '#FFFFFF'];
-        for (let i = 0; i < NUM_BALLS; i++) {
-            const x = Math.random() * (bgCanvas.width - 2 * BALL_RADIUS) + BALL_RADIUS;
-            const y = Math.random() * (bgCanvas.height - 2 * BALL_RADIUS) + BALL_RADIUS;
-            const color = ball_colors[i % ball_colors.length];
-            const velocityX = (Math.random() - 0.5) * 2;
-            const velocityY = (Math.random() - 0.5) * 2;
-            background_balls.push(new Ball(x, y, BALL_RADIUS, color, velocityX, velocityY));
+
+        const background_stars = [];
+        for (let i = 0; i < NUM_STARS; i++) {
+            const x = Math.random() * bgCanvas.width;
+            const y = Math.random() * bgCanvas.height;
+            const radius = Math.random() * STAR_RADIUS + 2; // Varying sizes
+            const color = star_colors[i % star_colors.length];
+            // MODIFIED: Slower velocity for a "drifting" effect
+            const velocityX = (Math.random() - 0.5) * 0.4;
+            const velocityY = (Math.random() - 0.5) * 0.4;
+            background_stars.push(new Star(x, y, radius, color, velocityX, velocityY));
         }
 
         function animateBackground() {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            background_balls.forEach(ball => {
-                ball.update(background_balls);
-                ball.draw();
-            });
             requestAnimationFrame(animateBackground);
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            background_stars.forEach(p => {
+                p.update(background_stars);
+                p.draw();
+            });
         }
-        
-        window.addEventListener('resize', () => {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-        });
-
+        window.addEventListener('resize', () => { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; /* Add logic to re-populate stars if needed */});
         animateBackground();
-        // --- END OF BACKGROUND SCRIPT ---
 
 
-        // --- MAIN CHART SCRIPT ---
+        // --- MAIN CHART SCRIPT (Unchanged) ---
         const labels = ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'];
-        const accuracyData = [91.29, 97.92, 87.04, 90.6, 92.75, 87.8];
+        const personalAccuracyData = [91.29, 97.92, 87.04, 90.6, 92.75, 87.8];
         const productivityData = [578, 731, 174, 414, 212, 65];
+        const projectAccuracyData = [86, 86, 86, 86, 86, 86];
+        const ratings = ['C', 'B', 'C', 'B', 'C+', 'C'];
 
         const ctx = document.getElementById('performanceChart').getContext('2d');
         const performanceChart = new Chart(ctx, {
             type: 'bar',
-            data: { /* Chart data is unchanged */ },
-            options: { /* Chart options are unchanged */ }
+            data: { labels: labels, datasets: [ { type: 'line', label: 'Personal Accuracy (%)', data: personalAccuracyData, borderColor: 'rgb(251, 146, 60)', backgroundColor: 'rgba(251, 146, 60, 0.2)', yAxisID: 'y1', tension: 0.3, fill: true, }, { type: 'line', label: 'Project Accuracy Target (%)', data: projectAccuracyData, borderColor: 'rgb(34, 197, 94)', borderWidth: 2, borderDash: [5, 5], yAxisID: 'y1', tension: 0, pointRadius: 0, fill: false, }, { type: 'bar', label: 'Productivity (Tasks)', data: productivityData, backgroundColor: 'rgba(20, 184, 166, 0.7)', borderColor: 'rgb(20, 184, 266)', yAxisID: 'y', barPercentage: 0.6, categoryPercentage: 0.7, } ] },
+            options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, }, scales: { y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Productivity (Number of Tasks)', color: '#d1d5db', font: { weight: 'bold' } }, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }, }, y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Accuracy (%)', color: '#d1d5db', font: { weight: 'bold' } }, min: 80, max: 100, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }, x: { ticks: { color: '#9ca3af' }, grid: { display: false } } }, plugins: { legend: { position: 'top', labels: { color: '#d1d5db', font: { size: 14 } } }, tooltip: { backgroundColor: '#1f2937', titleColor: '#ffffff', bodyColor: '#e5e7eb', titleFont: { weight: 'bold' }, bodyFont: { size: 14 }, padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.dataset.yAxisID === 'y1') { label += context.parsed.y.toFixed(2) + '%'; } else { label += context.parsed.y; } return label; }, footer: function(tooltipItems) { const index = tooltipItems[0].dataIndex; return 'Rating: ' + ratings[index]; } } } } }
         });
         
-        // This part of the script is identical to the previous version
-        performanceChart.data.labels = labels;
-        performanceChart.data.datasets = [
-            {
-                type: 'line', label: 'Accuracy (%)', data: accuracyData, borderColor: 'rgb(251, 146, 60)',
-                backgroundColor: 'rgba(251, 146, 60, 0.2)', yAxisID: 'y1', tension: 0.3, fill: true,
-            },
-            {
-                type: 'bar', label: 'Productivity (Tasks)', data: productivityData, backgroundColor: 'rgba(249, 115, 22, 0.8)',
-                borderColor: 'rgb(249, 115, 22)', yAxisID: 'y', barPercentage: 0.6, categoryPercentage: 0.7,
-            }
-        ];
-        performanceChart.options = {
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
-            scales: {
-                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Productivity (Number of Tasks)', color: '#d1d5db', font: { weight: 'bold' } }, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }, },
-                y1: { type: 'linear', display: true, position: 'right', title: { display: 'true', text: 'Accuracy (%)', color: '#d1d5db', font: { weight: 'bold' } }, min: Math.min(...accuracyData) - 5 < 0 ? 0 : Math.min(...accuracyData) - 5, max: 100, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
-            },
-            plugins: {
-                legend: { position: 'top', labels: { color: '#d1d5db', font: { size: 14 } } },
-                tooltip: { backgroundColor: '#1f2937', titleColor: '#ffffff', bodyColor: '#e5e7eb', titleFont: { weight: 'bold' }, bodyFont: { size: 14 }, padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-                    callbacks: {
-                        label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.dataset.yAxisID === 'y1') { label += context.parsed.y.toFixed(2) + '%'; } else { label += context.parsed.y; } return label; }
-                    }
-                }
-            }
-        };
-        performanceChart.update();
-
         document.getElementById('generationDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     </script>
 
